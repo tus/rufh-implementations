@@ -13,12 +13,13 @@ func main() {
 	ctx := context.Background()
 	ctx = httptrace.WithClientTrace(ctx, &httptrace.ClientTrace{
 		Got1xxResponse: func(code int, header textproto.MIMEHeader) error {
-			fmt.Println(code, header)
+			uploadUrl := header.Get("Location")
+			fmt.Printf("Received 1xx response: %d. Location is: %s\n", code, uploadUrl)
 			return nil
 		},
 	})
 
-	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/", nil)
+	req, err := http.NewRequestWithContext(ctx, "POST", "http://localhost:8080/", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,5 +30,6 @@ func main() {
 	}
 	defer res.Body.Close()
 
-	fmt.Printf("Response code: %d\n", res.StatusCode)
+	uploadUrl := res.Header.Get("Location")
+	fmt.Printf("Received 2xx response: %d. Location is: %s\n", res.StatusCode, uploadUrl)
 }
