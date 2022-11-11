@@ -155,7 +155,7 @@ func UploadAppendingHandler(w http.ResponseWriter, r *http.Request) {
 	isComplete_client := !getUploadIncomplete(r)
 	offset_client, ok := getUploadOffset(r)
 	if !ok {
-		w.WriteHeader(500)
+		w.WriteHeader(400)
 		w.Write([]byte("invalid or missing Upload-Offset header\n"))
 		return
 	}
