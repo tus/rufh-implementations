@@ -2,7 +2,7 @@
 
 This repository contains a server and client implementation of the [draft-ietf-httpbis-resumable-upload](https://datatracker.ietf.org/doc/draft-ietf-httpbis-resumable-upload/). Its latest iteration can be found at the [httpwg/http-extensions repository](https://github.com/httpwg/http-extensions/blob/main/draft-ietf-httpbis-resumable-upload.md).
 
-The implementations are based on the draft -00 with following additional proposals:
+The implementations are based on the draft [-01](https://datatracker.ietf.org/doc/draft-ietf-httpbis-resumable-upload/01/).
 
 ## Requirements
 
