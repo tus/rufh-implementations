@@ -5,7 +5,6 @@ This repository contains a server and client implementation of the [draft-ietf-h
 The implementations are based on the draft -00 with following additional proposals:
 
 - Server-generated upload URLs (https://github.com/httpwg/http-extensions/pull/2292)
-- Retry-able upload creations using Idempotency-Key (https://github.com/httpwg/http-extensions/issues/2293)
 
 ## Requirements
 
@@ -80,26 +79,5 @@ HTTP/1.1 200 OK
 Upload-Incomplete: ?0
 Upload-Offset: 11
 Date: Fri, 11 Nov 2022 01:12:31 GMT
-Content-Length: 0
-```
-
-3. Upload a file while retrying the Upload Creation Procedure using Idempotency-Key:
-```
-$ curl -i -X POST -H 'Upload-Incomplete: ?0' -H 'Idempotency-Key: foo' -d 'hello world' http://localhost:8080/
-HTTP/1.1 104 status code 104
-Location: http://localhost:8080/uploads/5d167756-db41-4a5a-855f-5af346c23558
-
-HTTP/1.1 201 Created
-Location: http://localhost:8080/uploads/5d167756-db41-4a5a-855f-5af346c23558
-Upload-Incomplete: ?0
-Upload-Offset: 11
-Date: Fri, 11 Nov 2022 01:15:22 GMT
-Content-Length: 0
-
-$ curl -i -X POST -H 'Upload-Incomplete: ?0' -H 'Idempotency-Key: foo' -d 'hello world' http://localhost:8080/
-HTTP/1.1 200 OK
-Upload-Incomplete: ?0
-Upload-Offset: 11
-Date: Fri, 11 Nov 2022 01:15:25 GMT
 Content-Length: 0
 ```
