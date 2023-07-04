@@ -13,6 +13,7 @@ import (
 )
 
 const UploadDir = "./uploads/"
+const InteropVersion = "3"
 
 func main() {
 	r := mux.NewRouter()
@@ -49,10 +50,15 @@ func UploadCreationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Respond with informational response
 	uploadUrl := "http://localhost:8080/uploads/" + uploadId
 	w.Header().Set("Location", uploadUrl)
-	w.WriteHeader(104)
+
+	// Respond with informational response, if interop version matches
+	if getInteropVersion(r) == InteropVersion {
+		w.Header().Set("Upload-Draft-Interop-Version", InteropVersion)
+		w.WriteHeader(104)
+		w.Header().Del("Upload-Draft-Interop-Version")
+	}
 
 	// Copy request body to file
 	_, err = io.Copy(file, r.Body)
@@ -177,6 +183,10 @@ func UploadCancellationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = os.Remove(UploadDir + id + ".incomplete")
+}
+
+func getInteropVersion(r *http.Request) string {
+	return r.Header.Get("Upload-Draft-Interop-Version")
 }
 
 func getUploadIncomplete(r *http.Request) bool {
