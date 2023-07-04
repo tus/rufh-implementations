@@ -4,8 +4,6 @@ This repository contains a server and client implementation of the [draft-ietf-h
 
 The implementations are based on the draft -00 with following additional proposals:
 
-- Server-generated upload URLs (https://github.com/httpwg/http-extensions/pull/2292)
-
 ## Requirements
 
 The implementations have been developed using Go 1.19.
