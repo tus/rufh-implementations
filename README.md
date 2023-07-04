@@ -3,6 +3,7 @@
 This repository contains a server and client implementation of the [draft-ietf-httpbis-resumable-upload](https://datatracker.ietf.org/doc/draft-ietf-httpbis-resumable-upload/). Its latest iteration can be found at the [httpwg/http-extensions repository](https://github.com/httpwg/http-extensions/blob/main/draft-ietf-httpbis-resumable-upload.md).
 
 The implementations are based on the draft -00 with following additional proposals:
+
 - Server-generated upload URLs (https://github.com/httpwg/http-extensions/pull/2292)
 - Retry-able upload creations using Idempotency-Key (https://github.com/httpwg/http-extensions/issues/2293)
 
@@ -17,7 +18,7 @@ The client is located at `client/`. Currently, it is not able to upload files bu
 To run it (after running the server in a separate terminal):
 
 ```
-go run client/main.go
+cd client/ && go run main.go
 ```
 
 ## Server
@@ -27,7 +28,7 @@ The server is located at `server/`. Once started, it accepts the Upload Creation
 To run it:
 
 ```
-go run server/main.go
+cd server/ && go run main.go
 ```
 
 ## Curl Examples
@@ -48,6 +49,7 @@ Content-Length: 0
 ```
 
 2. Upload a file over two requests using Upload Appending Procedure and an Offset Retrieving Procedure:
+
 ```
 $ curl -i -X POST -H 'Upload-Incomplete: ?1' http://localhost:8080/
 HTTP/1.1 104 status code 104
