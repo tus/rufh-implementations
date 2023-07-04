@@ -1,11 +1,8 @@
 package main
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"io"
-	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -16,6 +13,7 @@ import (
 )
 
 const UploadDir = "./uploads/"
+const InteropVersion = "3"
 
 func main() {
 	r := mux.NewRouter()
@@ -35,76 +33,32 @@ func UploadCreationHandler(w http.ResponseWriter, r *http.Request) {
 	var file *os.File
 	var err error
 
-	idempotencyKey := getIdempotencyKey(r)
-	if idempotencyKey != "" {
-		content, err := os.ReadFile("./uploads/" + idempotencyKey)
-		if err != nil {
-			if !errors.Is(err, fs.ErrNotExist) {
-				sendError(w, err)
-				return
-			}
-		} else {
-			uploadId = string(content)
+	// Create a new upload.
+	uploadId = uuid.NewString()
 
-			var isComplete bool
-			var exists bool
-			var offset int64
-			file, exists, isComplete, offset, err = loadUpload(uploadId)
-			if err != nil {
-				sendError(w, err)
-				return
-			}
-			if !exists {
-				uploadId = ""
-			} else {
-				defer file.Close()
-				if isComplete {
-					// If the upload is complete, we simply discard the request body
-					// and respond with the upload state.
-					setUploadHeaders(w, isComplete, offset)
-					return
-				}
+	// Create file to save uploaded chunks
+	file, err = os.OpenFile("./uploads/"+uploadId, os.O_WRONLY|os.O_CREATE, 0o644)
+	if err != nil {
+		sendError(w, err)
+		return
+	}
+	defer file.Close()
 
-				// Discard bytes, so request body is at same offset as file
-				if _, err := io.CopyN(io.Discard, r.Body, offset); err != nil {
-					sendError(w, err)
-					return
-				}
-			}
-		}
+	// Create file to indicate incompleteness
+	if err := os.WriteFile("./uploads/"+uploadId+".incomplete", nil, 0o644); err != nil {
+		sendError(w, err)
+		return
 	}
 
-	// If we were not able to find an upload using an idempotency key, create a new upload.
-	if uploadId == "" {
-		uploadId = uuid.NewString()
-
-		// Create file to save uploaded chunks
-		file, err = os.OpenFile("./uploads/"+uploadId, os.O_WRONLY|os.O_CREATE, 0o644)
-		if err != nil {
-			sendError(w, err)
-			return
-		}
-		defer file.Close()
-
-		// Create file to indicate incompleteness
-		if err := os.WriteFile("./uploads/"+uploadId+".incomplete", nil, 0o644); err != nil {
-			sendError(w, err)
-			return
-		}
-
-		if idempotencyKey != "" {
-			// Create file to look up idempotency key
-			if err := os.WriteFile("./uploads/"+idempotencyKey, []byte(uploadId), 0o644); err != nil {
-				sendError(w, err)
-				return
-			}
-		}
-	}
-
-	// Respond with informational response
 	uploadUrl := "http://localhost:8080/uploads/" + uploadId
 	w.Header().Set("Location", uploadUrl)
-	w.WriteHeader(104)
+
+	// Respond with informational response, if interop version matches
+	if getInteropVersion(r) == InteropVersion {
+		w.Header().Set("Upload-Draft-Interop-Version", InteropVersion)
+		w.WriteHeader(104)
+		w.Header().Del("Upload-Draft-Interop-Version")
+	}
 
 	// Copy request body to file
 	_, err = io.Copy(file, r.Body)
@@ -229,18 +183,10 @@ func UploadCancellationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = os.Remove(UploadDir + id + ".incomplete")
-
-	// TODO: link from Idempotency-Key should also be removed, if available
 }
 
-func getIdempotencyKey(r *http.Request) string {
-	idempotencyKey := r.Header.Get("Idempotency-Key")
-	if idempotencyKey == "" {
-		return ""
-	}
-
-	sum := sha256.Sum256([]byte(idempotencyKey))
-	return hex.EncodeToString(sum[:])
+func getInteropVersion(r *http.Request) string {
+	return r.Header.Get("Upload-Draft-Interop-Version")
 }
 
 func getUploadIncomplete(r *http.Request) bool {
