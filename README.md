@@ -28,6 +28,6 @@ The goal is to have interoperable implementations for testing purposes. Below sh
 | `servers/go` | ?[^2] | ✅ | ✅ |
 | tusdotnet | ?[^2] | ?[^2] | ?[^2] |
 
-[^1]: Swift NIO implements is still buggy: https://lists.w3.org/Archives/Public/ietf-http-wg/2023JulSep/0025.html 
+[^1]: Swift NIO implementation is still buggy: https://lists.w3.org/Archives/Public/ietf-http-wg/2023JulSep/0025.html 
 [^2]: Interoperability has not been tested yet.
 [^3]: [Cross-Origin Resource Sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) is not supported by server.
