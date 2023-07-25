@@ -4,7 +4,7 @@
 
 ## Running
 
-1. Download the pre-built binary from https://github.com/tus/tusd/releases/tag/v1.12.0 (or obtain the source and compile it own your own).
+1. Download the pre-built binary from https://github.com/tus/tusd/releases/tag/v1.12.1 (or obtain the source and compile it own your own).
    ```bash
    # For example (be sure to change to your OS and architecture):
    wget https://github.com/tus/tusd/releases/download/v1.12.1/tusd_darwin_arm64.zip
