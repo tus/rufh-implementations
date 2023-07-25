@@ -17,11 +17,13 @@ The implementations are based on the draft [-01](https://datatracker.ietf.org/do
 
 ## Interoperability
 
+The goal is to have interoperable implementations for testing purposes. Below shows a table of the interopability between various client and server implementations.
+
 | |`clients/ios` | `clients/go` |
 |--|--|--|
 | `servers/swift-nio` | ❌[^1] | ✅ |
 | `servers/tusd` | ✅ | ✅ |
-| tusddotnet | ?[^2] | ?[^2] |
+| tusdotnet | ?[^2] | ?[^2] |
 
 [^1]: Swift NIO implements is still buggy: https://lists.w3.org/Archives/Public/ietf-http-wg/2023JulSep/0025.html 
 [^2]: Interoperability has not been tested yet.
