@@ -6,13 +6,14 @@ The implementations are based on the draft [-01](https://datatracker.ietf.org/do
 
 ## Clients
 
-- `clients/ios`: iOS application built using Swift to demonstrate the new resumability support in `URLSessions` in iOS 17+
+- `clients/ios`: iOS application built using Swift to demonstrate the new resumability support in `URLSessions` in iOS 17+.
 - `clients/go`: CLI interface for resumable uploads built using Go.
 
 ## Servers
 
-- `servers/swift-nio`: Swift NIO server with support for transparent, resumable uploads
+- `servers/swift-nio`: Swift NIO server with support for transparent, resumable uploads.
 - `servers/tusd`: Feature-rich upload server written in Go.
+- `servers/go`: A simple Go server example.
 - [tusdotnet](https://github.com/tusdotnet/tusdotnet/tree/POC/tus2): Feature-rich upload server using the .NET ecosystem.
 
 ## Interoperability
@@ -23,6 +24,7 @@ The goal is to have interoperable implementations for testing purposes. Below sh
 |--|--|--|
 | `servers/swift-nio` | ❌[^1] | ✅ |
 | `servers/tusd` | ✅ | ✅ |
+| `servers/go` | ?[^2] | ✅ |
 | tusdotnet | ?[^2] | ?[^2] |
 
 [^1]: Swift NIO implements is still buggy: https://lists.w3.org/Archives/Public/ietf-http-wg/2023JulSep/0025.html 
