@@ -4,7 +4,7 @@ This examples contains an iOS app using Swift for demonstrating resumable file u
 
 ## Directory Structure
 
-- `ResumableUploadExample/ContentView.swift` contains the main logic for upload handling.
+- `ResumableUploadExample/ContentView.swift` contains the main logic for upload handling. There you can also adapt the URL of your resumable upload server.
 
 ## Requirements
 
