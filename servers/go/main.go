@@ -23,6 +23,7 @@ func main() {
 	r.HandleFunc("/uploads/{id}", UploadCancellationHandler).Methods("DELETE")
 	http.Handle("/", r)
 
+	log.Println("Listening on http://localhost:8080/")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
