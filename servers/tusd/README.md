@@ -1,13 +1,13 @@
 # tusd Resumable Upload Server
 
-[tusd](https://github.com/tus/tusd) is a server implementing the [tus resumable upload protocol](https://tus.io). Since version v1.12.0, it also provides experimental support for the resumable upload draft from the HTTP working group. It is a feature-rich upload server and supports storing data on various cloud providers and notifying applications about upload progress (see its [documentation](https://github.com/tus/tusd#documentation)).
+[tusd](https://github.com/tus/tusd) is a server implementing the [tus resumable upload protocol](https://tus.io). Since version v1.12.1, it also provides experimental support for the resumable upload draft from the HTTP working group. It is a feature-rich upload server and supports storing data on various cloud providers and notifying applications about upload progress (see its [documentation](https://github.com/tus/tusd#documentation)).
 
 ## Running
 
 1. Download the pre-built binary from https://github.com/tus/tusd/releases/tag/v1.12.0 (or obtain the source and compile it own your own).
    ```bash
    # For example (be sure to change to your OS and architecture):
-   wget https://github.com/tus/tusd/releases/download/v1.12.0/tusd_darwin_arm64.zip
+   wget https://github.com/tus/tusd/releases/download/v1.12.1/tusd_darwin_arm64.zip
    ```
 2. Extract the archive
    ```bash
