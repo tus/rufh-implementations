@@ -13,6 +13,7 @@ The implementations are based on the draft [-01](https://datatracker.ietf.org/do
 
 - `servers/swift-nio`: Swift NIO server with support for transparent, resumable uploads
 - `servers/tusd`: Feature-rich upload server written in Go.
+- [tusdotnet](https://github.com/tusdotnet/tusdotnet/tree/POC/tus2): Feature-rich upload server using the .NET ecosystem.
 
 ## Interoperability
 
@@ -20,5 +21,7 @@ The implementations are based on the draft [-01](https://datatracker.ietf.org/do
 |--|--|--|
 | `servers/swift-nio` | ❌[^1] | ✅ |
 | `servers/tusd` | ✅ | ✅ |
+| tusddotnet | ?[^2] | ?[^2] |
 
 [^1]: Swift NIO implements is still buggy: https://lists.w3.org/Archives/Public/ietf-http-wg/2023JulSep/0025.html 
+[^2]: Interoperability has not been tested yet.
