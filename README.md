@@ -18,8 +18,7 @@ The implementations are based on the draft [-01](https://datatracker.ietf.org/do
 
 | |`clients/ios` | `clients/go` |
 |--|--|--|
-| `servers/swift-nio` | ❌[^1] | ?[^2] |
-| `servers/tusd` | ✅ | ?[^2] |
+| `servers/swift-nio` | ❌[^1] | ✅ |
+| `servers/tusd` | ✅ | ✅ |
 
 [^1]: Swift NIO implements is still buggy: https://lists.w3.org/Archives/Public/ietf-http-wg/2023JulSep/0025.html 
-[^2]: The Go client is not feature-enough to be tested.
