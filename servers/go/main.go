@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 const UploadDir = "./uploads/"
@@ -21,7 +22,14 @@ func main() {
 	r.HandleFunc("/uploads/{id}", UploadAppendingHandler).Methods("PATCH")
 	r.HandleFunc("/uploads/{id}", OffsetRetrievingHandler).Methods("HEAD")
 	r.HandleFunc("/uploads/{id}", UploadCancellationHandler).Methods("DELETE")
-	http.Handle("/", r)
+
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"POST", "PATCH", "HEAD", "DELETE"},
+		AllowedHeaders: []string{"*"},
+		ExposedHeaders: []string{"Upload-Draft-Interop-Version", "Upload-Offset", "Upload-Incomplete", "Location"},
+	})
+	http.Handle("/", c.Handler(r))
 
 	log.Println("Listening on http://localhost:8080/")
 	log.Fatal(http.ListenAndServe(":8080", nil))
