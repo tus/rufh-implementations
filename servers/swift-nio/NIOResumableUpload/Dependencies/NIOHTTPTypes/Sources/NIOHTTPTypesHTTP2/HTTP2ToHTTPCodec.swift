@@ -18,39 +18,37 @@ A dependency of the sample code project.
 //
 //===----------------------------------------------------------------------===//
 
-import NIOCore
-import NIOHTTP2
-import NIOHPACK
 import HTTPTypes
-import HTTPTypesNIO
+import NIOCore
+import NIOHPACK
+import NIOHTTP2
+import NIOHTTPTypes
 
 // MARK: - Client
 
 private struct BaseClientCodec {
-    private var headerStateMachine: HTTP2HeadersStateMachine = HTTP2HeadersStateMachine(mode: .client)
+    private var headerStateMachine: HTTP2HeadersStateMachine = .init(mode: .client)
 
     private var outgoingHTTP1RequestHead: HTTPRequest?
 
-    mutating func processInboundData(_ data: HTTP2Frame.FramePayload) throws -> (
-        first: HTTPTypeClientResponsePart?, second: HTTPTypeClientResponsePart?
-    ) {
+    mutating func processInboundData(_ data: HTTP2Frame.FramePayload) throws -> (first: HTTPTypeResponsePart?, second: HTTPTypeResponsePart?) {
         switch data {
         case .headers(let headerContent):
             switch try self.headerStateMachine.newHeaders(block: headerContent.headers) {
             case .trailer:
-                return (first: .end(try headerContent.headers.newTrailers), second: nil)
+                return try (first: .end(headerContent.headers.newTrailers), second: nil)
 
             case .informationalResponseHead:
-                return (first: .head(try headerContent.headers.newResponse), second: nil)
+                return try (first: .head(headerContent.headers.newResponse), second: nil)
 
             case .finalResponseHead:
-                guard outgoingHTTP1RequestHead != nil else {
+                guard self.outgoingHTTP1RequestHead != nil else {
                     preconditionFailure("Expected not to get a response without having sent a request")
                 }
                 self.outgoingHTTP1RequestHead = nil
                 let respHead = try headerContent.headers.newResponse
-                let first = HTTPTypeClientResponsePart.head(respHead)
-                var second: HTTPTypeClientResponsePart? = nil
+                let first = HTTPTypeResponsePart.head(respHead)
+                var second: HTTPTypeResponsePart?
                 if headerContent.endStream {
                     second = .end(nil)
                 }
@@ -64,8 +62,8 @@ private struct BaseClientCodec {
                 preconditionFailure("Received DATA frame with non-bytebuffer IOData")
             }
 
-            var first = HTTPTypeClientResponsePart.body(buffer)
-            var second: HTTPTypeClientResponsePart? = nil
+            var first = HTTPTypeResponsePart.body(buffer)
+            var second: HTTPTypeResponsePart?
             if content.endStream {
                 if buffer.readableBytes == 0 {
                     first = .end(nil)
@@ -80,7 +78,7 @@ private struct BaseClientCodec {
         }
     }
 
-    mutating func processOutboundData(_ data: HTTPTypeClientRequestPart, allocator: ByteBufferAllocator) throws -> HTTP2Frame.FramePayload {
+    mutating func processOutboundData(_ data: HTTPTypeRequestPart, allocator: ByteBufferAllocator) throws -> HTTP2Frame.FramePayload {
         switch data {
         case .head(let head):
             precondition(self.outgoingHTTP1RequestHead == nil, "Only a single HTTP request allowed per HTTP2 stream")
@@ -88,11 +86,13 @@ private struct BaseClientCodec {
             let headerContent = HTTP2Frame.FramePayload.Headers(headers: HPACKHeaders(head))
             return .headers(headerContent)
         case .body(let body):
-            return .data(HTTP2Frame.FramePayload.Data(data: body))
+            return .data(HTTP2Frame.FramePayload.Data(data: .byteBuffer(body)))
         case .end(let trailers):
-            if let trailers = trailers {
-                return .headers(.init(headers: HPACKHeaders(trailers),
-                                      endStream: true))
+            if let trailers {
+                return .headers(.init(
+                    headers: HPACKHeaders(trailers),
+                    endStream: true
+                ))
             } else {
                 return .data(.init(data: .byteBuffer(allocator.buffer(capacity: 0)), endStream: true))
             }
@@ -103,31 +103,30 @@ private struct BaseClientCodec {
 /// A simple channel handler that translates HTTP/2 concepts into shared HTTP types,
 /// and vice versa, for use on the client side.
 ///
-/// Use this channel handler alongside the ``HTTP2StreamMultiplexer`` to
+/// Use this channel handler alongside the `HTTP2StreamMultiplexer` to
 /// help provide an HTTP transaction-level abstraction on top of an HTTP/2 multiplexed
 /// connection.
 ///
-/// This handler uses ``HTTP2Frame/FramePayload`` as its HTTP/2 currency type.
+/// This handler uses `HTTP2Frame.FramePayload` as its HTTP/2 currency type.
 public final class HTTP2FramePayloadToHTTPClientCodec: ChannelInboundHandler, ChannelOutboundHandler {
     public typealias InboundIn = HTTP2Frame.FramePayload
-    public typealias InboundOut = HTTPTypeClientResponsePart
+    public typealias InboundOut = HTTPTypeResponsePart
 
-    public typealias OutboundIn = HTTPTypeClientRequestPart
+    public typealias OutboundIn = HTTPTypeRequestPart
     public typealias OutboundOut = HTTP2Frame.FramePayload
 
     private var baseCodec: BaseClientCodec = .init()
 
-    public init() {
-    }
+    public init() {}
 
     public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let payload = self.unwrapInboundIn(data)
         do {
             let (first, second) = try self.baseCodec.processInboundData(payload)
-            if let first = first {
+            if let first {
                 context.fireChannelRead(self.wrapInboundOut(first))
             }
-            if let second = second {
+            if let second {
                 context.fireChannelRead(self.wrapInboundOut(second))
             }
         } catch {
@@ -151,20 +150,18 @@ public final class HTTP2FramePayloadToHTTPClientCodec: ChannelInboundHandler, Ch
 // MARK: - Server
 
 private struct BaseServerCodec {
-    private var headerStateMachine: HTTP2HeadersStateMachine = HTTP2HeadersStateMachine(mode: .server)
+    private var headerStateMachine: HTTP2HeadersStateMachine = .init(mode: .server)
 
-    mutating func processInboundData(_ data: HTTP2Frame.FramePayload) throws -> (
-        first: HTTPTypeServerRequestPart?, second: HTTPTypeServerRequestPart?
-    ) {
+    mutating func processInboundData(_ data: HTTP2Frame.FramePayload) throws -> (first: HTTPTypeRequestPart?, second: HTTPTypeRequestPart?) {
         switch data {
         case .headers(let headerContent):
             if case .trailer = try self.headerStateMachine.newHeaders(block: headerContent.headers) {
-                return (first: .end(try headerContent.headers.newTrailers), second: nil)
+                return try (first: .end(headerContent.headers.newTrailers), second: nil)
             } else {
                 let reqHead = try headerContent.headers.newRequest
 
-                let first = HTTPTypeServerRequestPart.head(reqHead)
-                var second: HTTPTypeServerRequestPart? = nil
+                let first = HTTPTypeRequestPart.head(reqHead)
+                var second: HTTPTypeRequestPart?
                 if headerContent.endStream {
                     second = .end(nil)
                 }
@@ -174,8 +171,8 @@ private struct BaseServerCodec {
             guard case .byteBuffer(let buffer) = dataContent.data else {
                 preconditionFailure("Received non-byteBuffer IOData from network")
             }
-            var first = HTTPTypeServerRequestPart.body(buffer)
-            var second: HTTPTypeServerRequestPart? = nil
+            var first = HTTPTypeRequestPart.body(buffer)
+            var second: HTTPTypeRequestPart?
             if dataContent.endStream {
                 if buffer.readableBytes == 0 {
                     first = .end(nil)
@@ -190,18 +187,20 @@ private struct BaseServerCodec {
         }
     }
 
-    mutating func processOutboundData(_ data: HTTPTypeServerResponsePart, allocator: ByteBufferAllocator) -> HTTP2Frame.FramePayload {
+    mutating func processOutboundData(_ data: HTTPTypeResponsePart, allocator: ByteBufferAllocator) -> HTTP2Frame.FramePayload {
         switch data {
         case .head(let head):
             let payload = HTTP2Frame.FramePayload.Headers(headers: HPACKHeaders(head))
             return .headers(payload)
         case .body(let body):
-            let payload = HTTP2Frame.FramePayload.Data(data: body)
+            let payload = HTTP2Frame.FramePayload.Data(data: .byteBuffer(body))
             return .data(payload)
         case .end(let trailers):
-            if let trailers = trailers {
-                return .headers(.init(headers: HPACKHeaders(trailers),
-                                      endStream: true))
+            if let trailers {
+                return .headers(.init(
+                    headers: HPACKHeaders(trailers),
+                    endStream: true
+                ))
             } else {
                 return .data(.init(data: .byteBuffer(allocator.buffer(capacity: 0)), endStream: true))
             }
@@ -212,32 +211,31 @@ private struct BaseServerCodec {
 /// A simple channel handler that translates HTTP/2 concepts into shared HTTP types,
 /// and vice versa, for use on the server side.
 ///
-/// Use this channel handler alongside the ``HTTP2StreamMultiplexer`` to
+/// Use this channel handler alongside the `HTTP2StreamMultiplexer` to
 /// help provide an HTTP transaction-level abstraction on top of an HTTP/2 multiplexed
 /// connection.
 ///
-/// This handler uses ``HTTP2Frame/FramePayload`` as its HTTP/2 currency type.
+/// This handler uses `HTTP2Frame.FramePayload` as its HTTP/2 currency type.
 public final class HTTP2FramePayloadToHTTPServerCodec: ChannelInboundHandler, ChannelOutboundHandler {
     public typealias InboundIn = HTTP2Frame.FramePayload
-    public typealias InboundOut = HTTPTypeServerRequestPart
+    public typealias InboundOut = HTTPTypeRequestPart
 
-    public typealias OutboundIn = HTTPTypeServerResponsePart
+    public typealias OutboundIn = HTTPTypeResponsePart
     public typealias OutboundOut = HTTP2Frame.FramePayload
 
     private var baseCodec: BaseServerCodec = .init()
 
-    public init() {
-    }
+    public init() {}
 
     public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let payload = self.unwrapInboundIn(data)
 
         do {
             let (first, second) = try self.baseCodec.processInboundData(payload)
-            if let first = first {
+            if let first {
                 context.fireChannelRead(self.wrapInboundOut(first))
             }
-            if let second = second {
+            if let second {
                 context.fireChannelRead(self.wrapInboundOut(second))
             }
         } catch {

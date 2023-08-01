@@ -5,16 +5,18 @@ Abstract:
 The child channel managing the channel pipeline of the channel handlers above the resumable upload.
 */
 
-import HTTPTypesNIO
-import NIOCore
 import Atomics
+import NIOCore
+import NIOHTTPTypes
 
 /// The child channel that persists across upload resumption attempts, delivering data as if it is
 /// a single HTTP upload.
 final class HTTPResumableUploadChannel: Channel, ChannelCore {
-    init(upload: HTTPResumableUpload,
-         parent: Channel,
-         channelConfigurator: (Channel) -> Void) {
+    init(
+        upload: HTTPResumableUpload,
+        parent: Channel,
+        channelConfigurator: (Channel) -> Void
+    ) {
         self.upload = upload
         self.allocator = parent.allocator
         self.closePromise = parent.eventLoop.makePromise()
@@ -73,7 +75,7 @@ final class HTTPResumableUploadChannel: Channel, ChannelCore {
     func setOption<Option>(_ option: Option, value: Option.Value) -> EventLoopFuture<Void> where Option: ChannelOption {
         if self.eventLoop.inEventLoop {
             do {
-                return self.eventLoop.makeSucceededFuture(try self.setOption0(option, value: value))
+                return try self.eventLoop.makeSucceededFuture(self.setOption0(option, value: value))
             } catch {
                 return self.eventLoop.makeFailedFuture(error)
             }
@@ -85,7 +87,7 @@ final class HTTPResumableUploadChannel: Channel, ChannelCore {
     func getOption<Option>(_ option: Option) -> EventLoopFuture<Option.Value> where Option: ChannelOption {
         if self.eventLoop.inEventLoop {
             do {
-                return self.eventLoop.makeSucceededFuture(try self.getOption0(option))
+                return try self.eventLoop.makeSucceededFuture(self.getOption0(option))
             } catch {
                 return self.eventLoop.makeFailedFuture(error)
             }
@@ -207,7 +209,7 @@ extension HTTPResumableUploadChannel {
         self.pipeline.fireChannelActive()
     }
 
-    func receive(_ part: HTTPTypeServerRequestPart) {
+    func receive(_ part: HTTPTypeRequestPart) {
         self.eventLoop.preconditionInEventLoop()
         self.pipeline.fireChannelRead(NIOAny(part))
     }

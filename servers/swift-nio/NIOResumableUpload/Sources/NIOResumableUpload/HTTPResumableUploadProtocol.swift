@@ -17,26 +17,28 @@ enum HTTPResumableUploadProtocol {
 
     static func featureDetectionResponse(resumePath: String, in context: HTTPResumableUploadContext) -> HTTPResponse {
         var response = HTTPResponse(status: .init(code: 104, reasonPhrase: "Upload Resumption Supported"))
-        response.headerFields[.uploadDraftInteropVersion] = currentInteropVersion
+        response.headerFields[.uploadDraftInteropVersion] = self.currentInteropVersion
         response.headerFields[.location] = context.origin + resumePath
         return response
     }
 
     static func offsetRetrievingResponse(offset: Int64, complete: Bool) -> HTTPResponse {
         var response = HTTPResponse(status: .noContent)
-        response.headerFields[.uploadDraftInteropVersion] = currentInteropVersion
+        response.headerFields[.uploadDraftInteropVersion] = self.currentInteropVersion
         response.headerFields.uploadIncomplete = !complete
         response.headerFields.uploadOffset = offset
         response.headerFields[.cacheControl] = "no-store"
         return response
     }
 
-    static func incompleteResponse(offset: Int64,
-                                   resumePath: String,
-                                   forUploadCreation: Bool,
-                                   in context: HTTPResumableUploadContext) -> HTTPResponse {
+    static func incompleteResponse(
+        offset: Int64,
+        resumePath: String,
+        forUploadCreation: Bool,
+        in context: HTTPResumableUploadContext
+    ) -> HTTPResponse {
         var response = HTTPResponse(status: .created)
-        response.headerFields[.uploadDraftInteropVersion] = currentInteropVersion
+        response.headerFields[.uploadDraftInteropVersion] = self.currentInteropVersion
         if forUploadCreation {
             response.headerFields[.location] = context.origin + resumePath
         }
@@ -47,20 +49,20 @@ enum HTTPResumableUploadProtocol {
 
     static func cancelledResponse() -> HTTPResponse {
         var response = HTTPResponse(status: .noContent)
-        response.headerFields[.uploadDraftInteropVersion] = currentInteropVersion
+        response.headerFields[.uploadDraftInteropVersion] = self.currentInteropVersion
         return response
     }
 
     static func notFoundResponse() -> HTTPResponse {
         var response = HTTPResponse(status: .notFound)
-        response.headerFields[.uploadDraftInteropVersion] = currentInteropVersion
+        response.headerFields[.uploadDraftInteropVersion] = self.currentInteropVersion
         response.headerFields[.contentLength] = "0"
         return response
     }
 
     static func conflictResponse(offset: Int64, complete: Bool) -> HTTPResponse {
         var response = HTTPResponse(status: .conflict)
-        response.headerFields[.uploadDraftInteropVersion] = currentInteropVersion
+        response.headerFields[.uploadDraftInteropVersion] = self.currentInteropVersion
         response.headerFields.uploadIncomplete = !complete
         response.headerFields.uploadOffset = offset
         response.headerFields[.contentLength] = "0"
@@ -69,7 +71,7 @@ enum HTTPResumableUploadProtocol {
 
     static func badRequestResponse() -> HTTPResponse {
         var response = HTTPResponse(status: .badRequest)
-        response.headerFields[.uploadDraftInteropVersion] = currentInteropVersion
+        response.headerFields[.uploadDraftInteropVersion] = self.currentInteropVersion
         response.headerFields[.contentLength] = "0"
         return response
     }
@@ -84,7 +86,7 @@ enum HTTPResumableUploadProtocol {
     }
 
     static func identifyRequest(_ request: HTTPRequest, in context: HTTPResumableUploadContext) -> RequestType {
-        if request.headerFields[.uploadDraftInteropVersion] != currentInteropVersion {
+        if request.headerFields[.uploadDraftInteropVersion] != self.currentInteropVersion {
             return .notSupported
         }
         let complete = request.headerFields.uploadIncomplete.map { !$0 }
@@ -129,13 +131,15 @@ enum HTTPResumableUploadProtocol {
         return strippedRequest
     }
 
-    static func processResponse(_ response: HTTPResponse,
-                                offset: Int64,
-                                resumePath: String,
-                                forUploadCreation: Bool,
-                                in context: HTTPResumableUploadContext) -> HTTPResponse {
+    static func processResponse(
+        _ response: HTTPResponse,
+        offset: Int64,
+        resumePath: String,
+        forUploadCreation: Bool,
+        in context: HTTPResumableUploadContext
+    ) -> HTTPResponse {
         var finalResponse = response
-        finalResponse.headerFields[.uploadDraftInteropVersion] = currentInteropVersion
+        finalResponse.headerFields[.uploadDraftInteropVersion] = self.currentInteropVersion
         if forUploadCreation {
             finalResponse.headerFields[.location] = context.origin + resumePath
         }

@@ -18,13 +18,13 @@ A dependency of the sample code project.
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
+import HTTPTypes
 import NIOCore
 import NIOEmbedded
 import NIOHTTP1
-import HTTPTypes
-import HTTPTypesNIO
-import HTTPTypesNIOHTTP1
+import NIOHTTPTypes
+import NIOHTTPTypesHTTP1
+import XCTest
 
 /// A handler that keeps track of all reads made on a channel.
 private final class InboundRecorder<Frame>: ChannelInboundHandler {
@@ -37,11 +37,11 @@ private final class InboundRecorder<Frame>: ChannelInboundHandler {
     }
 }
 
-private extension HTTPField.Name {
+extension HTTPField.Name {
     static let xFoo = Self("X-Foo")!
 }
 
-final class HTTPTypesNIOHTTP1Tests: XCTestCase {
+final class NIOHTTPTypesHTTP1Tests: XCTestCase {
     var channel: EmbeddedChannel!
 
     override func setUp() {
@@ -95,12 +95,12 @@ final class HTTPTypesNIOHTTP1Tests: XCTestCase {
     static let oldTrailers: HTTPHeaders = ["X-Foo": "Bar"]
 
     func testClientHTTP1ToHTTP() throws {
-        let recorder = InboundRecorder<HTTPTypeClientResponsePart>()
+        let recorder = InboundRecorder<HTTPTypeResponsePart>()
 
         try self.channel.pipeline.addHandlers(HTTP1ToHTTPClientCodec(), recorder).wait()
 
-        try self.channel.writeOutbound(HTTPTypeClientRequestPart.head(Self.request))
-        try self.channel.writeOutbound(HTTPTypeClientRequestPart.end(Self.trailers))
+        try self.channel.writeOutbound(HTTPTypeRequestPart.head(Self.request))
+        try self.channel.writeOutbound(HTTPTypeRequestPart.end(Self.trailers))
 
         XCTAssertEqual(try self.channel.readOutbound(as: HTTPClientRequestPart.self), .head(Self.oldRequest))
         XCTAssertEqual(try self.channel.readOutbound(as: HTTPClientRequestPart.self), .end(Self.oldTrailers))
@@ -111,11 +111,11 @@ final class HTTPTypesNIOHTTP1Tests: XCTestCase {
         XCTAssertEqual(recorder.receivedFrames[0], .head(Self.response))
         XCTAssertEqual(recorder.receivedFrames[1], .end(Self.trailers))
 
-        XCTAssertTrue(try channel.finish().isClean)
+        XCTAssertTrue(try self.channel.finish().isClean)
     }
 
     func testServerHTTP1ToHTTP() throws {
-        let recorder = InboundRecorder<HTTPTypeServerRequestPart>()
+        let recorder = InboundRecorder<HTTPTypeRequestPart>()
 
         try self.channel.pipeline.addHandlers(HTTP1ToHTTPServerCodec(secure: true), recorder).wait()
 
@@ -125,13 +125,13 @@ final class HTTPTypesNIOHTTP1Tests: XCTestCase {
         XCTAssertEqual(recorder.receivedFrames[0], .head(Self.requestNoSplitCookie))
         XCTAssertEqual(recorder.receivedFrames[1], .end(Self.trailers))
 
-        try self.channel.writeOutbound(HTTPTypeServerResponsePart.head(Self.response))
-        try self.channel.writeOutbound(HTTPTypeServerResponsePart.end(Self.trailers))
+        try self.channel.writeOutbound(HTTPTypeResponsePart.head(Self.response))
+        try self.channel.writeOutbound(HTTPTypeResponsePart.end(Self.trailers))
 
         XCTAssertEqual(try self.channel.readOutbound(as: HTTPServerResponsePart.self), .head(Self.oldResponse))
         XCTAssertEqual(try self.channel.readOutbound(as: HTTPServerResponsePart.self), .end(Self.oldTrailers))
 
-        XCTAssertTrue(try channel.finish().isClean)
+        XCTAssertTrue(try self.channel.finish().isClean)
     }
 
     func testClientHTTPToHTTP1() throws {
@@ -142,16 +142,16 @@ final class HTTPTypesNIOHTTP1Tests: XCTestCase {
         try self.channel.writeOutbound(HTTPClientRequestPart.head(Self.oldRequest))
         try self.channel.writeOutbound(HTTPClientRequestPart.end(Self.oldTrailers))
 
-        XCTAssertEqual(try self.channel.readOutbound(as: HTTPTypeClientRequestPart.self), .head(Self.request))
-        XCTAssertEqual(try self.channel.readOutbound(as: HTTPTypeClientRequestPart.self), .end(Self.trailers))
+        XCTAssertEqual(try self.channel.readOutbound(as: HTTPTypeRequestPart.self), .head(Self.request))
+        XCTAssertEqual(try self.channel.readOutbound(as: HTTPTypeRequestPart.self), .end(Self.trailers))
 
-        try self.channel.writeInbound(HTTPTypeClientResponsePart.head(Self.response))
-        try self.channel.writeInbound(HTTPTypeClientResponsePart.end(Self.trailers))
+        try self.channel.writeInbound(HTTPTypeResponsePart.head(Self.response))
+        try self.channel.writeInbound(HTTPTypeResponsePart.end(Self.trailers))
 
         XCTAssertEqual(recorder.receivedFrames[0], .head(Self.oldResponse))
         XCTAssertEqual(recorder.receivedFrames[1], .end(Self.oldTrailers))
 
-        XCTAssertTrue(try channel.finish().isClean)
+        XCTAssertTrue(try self.channel.finish().isClean)
     }
 
     func testServerHTTPToHTTP1() throws {
@@ -159,8 +159,8 @@ final class HTTPTypesNIOHTTP1Tests: XCTestCase {
 
         try self.channel.pipeline.addHandlers(HTTPToHTTP1ServerCodec(), recorder).wait()
 
-        try self.channel.writeInbound(HTTPTypeServerRequestPart.head(Self.request))
-        try self.channel.writeInbound(HTTPTypeServerRequestPart.end(Self.trailers))
+        try self.channel.writeInbound(HTTPTypeRequestPart.head(Self.request))
+        try self.channel.writeInbound(HTTPTypeRequestPart.end(Self.trailers))
 
         XCTAssertEqual(recorder.receivedFrames[0], .head(Self.oldRequest))
         XCTAssertEqual(recorder.receivedFrames[1], .end(Self.oldTrailers))
@@ -168,9 +168,9 @@ final class HTTPTypesNIOHTTP1Tests: XCTestCase {
         try self.channel.writeOutbound(HTTPServerResponsePart.head(Self.oldResponse))
         try self.channel.writeOutbound(HTTPServerResponsePart.end(Self.oldTrailers))
 
-        XCTAssertEqual(try self.channel.readOutbound(as: HTTPTypeServerResponsePart.self), .head(Self.response))
-        XCTAssertEqual(try self.channel.readOutbound(as: HTTPTypeServerResponsePart.self), .end(Self.trailers))
+        XCTAssertEqual(try self.channel.readOutbound(as: HTTPTypeResponsePart.self), .head(Self.response))
+        XCTAssertEqual(try self.channel.readOutbound(as: HTTPTypeResponsePart.self), .end(Self.trailers))
 
-        XCTAssertTrue(try channel.finish().isClean)
+        XCTAssertTrue(try self.channel.finish().isClean)
     }
 }

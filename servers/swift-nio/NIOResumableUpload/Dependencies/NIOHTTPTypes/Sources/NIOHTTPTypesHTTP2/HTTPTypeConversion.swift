@@ -18,8 +18,8 @@ A dependency of the sample code project.
 //
 //===----------------------------------------------------------------------===//
 
-import NIOHPACK
 import HTTPTypes
+import NIOHPACK
 
 private enum HTTP2TypeConversionError: Error {
     case multipleMethod
@@ -41,10 +41,9 @@ private enum HTTP2TypeConversionError: Error {
 extension HPACKIndexing {
     init(_ newIndexingStrategy: HTTPField.DynamicTableIndexingStrategy) {
         switch newIndexingStrategy {
-        case .automatic: self = .indexable
-        case .prefer: self = .indexable
         case .avoid: self = .nonIndexable
         case .disallow: self = .neverIndexed
+        default: self = .indexable
         }
     }
 
@@ -59,24 +58,24 @@ extension HPACKIndexing {
 
 extension HPACKHeaders {
     mutating func add(newField field: HTTPField) {
-        add(name: field.name.canonicalName, value: field.value, indexing: HPACKIndexing(field.indexingStrategy))
+        self.add(name: field.name.canonicalName, value: field.value, indexing: HPACKIndexing(field.indexingStrategy))
     }
 
     init(_ newRequest: HTTPRequest) {
         var headers = HPACKHeaders()
         headers.reserveCapacity(newRequest.headerFields.count + 5)
 
-        headers.add(newField: newRequest.methodField)
-        if let field = newRequest.schemeField {
+        headers.add(newField: newRequest.pseudoHeaderFields.method)
+        if let field = newRequest.pseudoHeaderFields.scheme {
             headers.add(newField: field)
         }
-        if let field = newRequest.authorityField {
+        if let field = newRequest.pseudoHeaderFields.authority {
             headers.add(newField: field)
         }
-        if let field = newRequest.pathField {
+        if let field = newRequest.pseudoHeaderFields.path {
             headers.add(newField: field)
         }
-        if let field = newRequest.extendedConnectProtocolField {
+        if let field = newRequest.pseudoHeaderFields.extendedConnectProtocol {
             headers.add(newField: field)
         }
         for field in newRequest.headerFields {
@@ -89,7 +88,7 @@ extension HPACKHeaders {
         var headers = HPACKHeaders()
         headers.reserveCapacity(newResponse.headerFields.count + 1)
 
-        headers.add(newField: newResponse.statusField)
+        headers.add(newField: newResponse.pseudoHeaderFields.status)
         for field in newResponse.headerFields {
             headers.add(newField: field)
         }
@@ -118,8 +117,8 @@ extension HPACKHeaders {
             var protocolString: String? = nil
             var protocolIndexable: HPACKIndexing = .indexable
 
-            var index = startIndex
-            while index != endIndex {
+            var index = self.startIndex
+            while index != self.endIndex {
                 let (name, value, indexable) = self[index]
                 if !name.hasPrefix(":") {
                     break
@@ -168,17 +167,19 @@ extension HPACKHeaders {
                 throw HTTP2TypeConversionError.invalidMethod
             }
 
-            var request = HTTPRequest(method: method,
-                                      scheme: schemeString,
-                                      authority: authorityString,
-                                      path: pathString)
-            request.methodField.indexingStrategy = methodIndexable.newIndexingStrategy
-            request.schemeField?.indexingStrategy = schemeIndexable.newIndexingStrategy
-            request.authorityField?.indexingStrategy = authorityIndexable.newIndexingStrategy
-            request.pathField?.indexingStrategy = pathIndexable.newIndexingStrategy
+            var request = HTTPRequest(
+                method: method,
+                scheme: schemeString,
+                authority: authorityString,
+                path: pathString
+            )
+            request.pseudoHeaderFields.method.indexingStrategy = methodIndexable.newIndexingStrategy
+            request.pseudoHeaderFields.scheme?.indexingStrategy = schemeIndexable.newIndexingStrategy
+            request.pseudoHeaderFields.authority?.indexingStrategy = authorityIndexable.newIndexingStrategy
+            request.pseudoHeaderFields.path?.indexingStrategy = pathIndexable.newIndexingStrategy
             if let protocolString {
                 request.extendedConnectProtocol = protocolString
-                request.extendedConnectProtocolField?.indexingStrategy = protocolIndexable.newIndexingStrategy
+                request.pseudoHeaderFields.extendedConnectProtocol?.indexingStrategy = protocolIndexable.newIndexingStrategy
             }
 
             request.headerFields.reserveCapacity(count)
@@ -203,8 +204,8 @@ extension HPACKHeaders {
             var statusString: String? = nil
             var statusIndexable: HPACKIndexing = .indexable
 
-            var index = startIndex
-            while index != endIndex {
+            var index = self.startIndex
+            while index != self.endIndex {
                 let (name, value, indexable) = self[index]
                 if !name.hasPrefix(":") {
                     break
@@ -226,15 +227,15 @@ extension HPACKHeaders {
                 throw HTTP2TypeConversionError.missingStatus
             }
             guard let status = Int(statusString),
-                  (0...999).contains(status) else {
+                  (0 ... 999).contains(status) else {
                 throw HTTP2TypeConversionError.invalidStatus
             }
 
             var response = HTTPResponse(status: HTTPResponse.Status(code: status))
-            response.statusField.indexingStrategy = statusIndexable.newIndexingStrategy
+            response.pseudoHeaderFields.status.indexingStrategy = statusIndexable.newIndexingStrategy
 
             response.headerFields.reserveCapacity(count)
-            while index != endIndex {
+            while index != self.endIndex {
                 let (name, value, indexable) = self[index]
                 if name.hasPrefix(":") {
                     throw HTTP2TypeConversionError.pseudoFieldNotFirst

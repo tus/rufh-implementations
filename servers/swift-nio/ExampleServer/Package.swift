@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -12,7 +12,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.0.0"),
         .package(url: "https://github.com/apple/swift-nio-transport-services.git", from: "1.13.0"),
         .package(path: "../NIOResumableUpload"),
-        .package(path: "../NIOResumableUpload/Dependencies/swift-http-types"),
+        .package(path: "../NIOResumableUpload/Dependencies/NIOHTTPTypes"),
     ],
 
     targets: [
@@ -25,9 +25,8 @@ let package = Package(
                 .product(name: "NIOHTTP1", package: "swift-nio"),
                 .product(name: "NIOTransportServices", package: "swift-nio-transport-services"),
                 .product(name: "NIOResumableUpload", package: "NIOResumableUpload"),
-                .product(name: "HTTPTypesNIOHTTP1", package: "swift-http-types"),
-                .product(name: "HTTPTypesNIO", package: "swift-http-types"),
-                .product(name: "HTTPTypes", package: "swift-http-types"),
+                .product(name: "NIOHTTPTypesHTTP1", package: "NIOHTTPTypes"),
+                .product(name: "NIOHTTPTypes", package: "NIOHTTPTypes"),
             ],
             path: "Sources"),
     ]

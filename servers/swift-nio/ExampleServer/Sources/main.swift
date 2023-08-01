@@ -3,8 +3,8 @@ import NIOHTTP1
 import NIO
 import NIOTransportServices
 import NIOResumableUpload
-import HTTPTypesNIOHTTP1
-import HTTPTypesNIO
+import NIOHTTPTypesHTTP1
+import NIOHTTPTypes
 import HTTPTypes
 
 let HOST = "127.0.0.1"
@@ -13,8 +13,8 @@ let PORT = 8080
 let uploadContext = HTTPResumableUploadContext(origin: "http://\(HOST):\(PORT)")
 
 final class UploadHandler: ChannelInboundHandler {
-    typealias InboundIn = HTTPTypeServerRequestPart
-    typealias OutboundOut = HTTPTypeServerResponsePart
+    typealias InboundIn = HTTPTypeRequestPart
+    typealias OutboundOut = HTTPTypeResponsePart
     
     private var bodyLength: Int = 0
 
@@ -42,7 +42,7 @@ final class UploadHandler: ChannelInboundHandler {
 
             // Set the data
             let buffer = context.channel.allocator.buffer(string: responseBody)
-            context.writeAndFlush(self.wrapOutboundOut(.body(.byteBuffer(buffer))), promise: nil)
+            context.writeAndFlush(self.wrapOutboundOut(.body(buffer)), promise: nil)
         }
     }
 }

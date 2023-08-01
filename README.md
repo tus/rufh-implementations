@@ -23,11 +23,10 @@ The goal is to have interoperable implementations for testing purposes. Below sh
 
 | |`clients/ios` | `clients/go` | `client/tus-js` |
 |--|--|--|--|
-| `servers/swift-nio` | ❌[^1] | ✅ | ❌[^3] |
+| `servers/swift-nio` | ✅ | ✅ | ❌[^3] |
 | `servers/tusd` | ✅ | ✅ | ✅ |
 | `servers/go` | ?[^2] | ✅ | ✅ |
 | tusdotnet | ✅ | ?[^2] | ?[^2] |
 
-[^1]: Swift NIO implementation is still buggy: https://lists.w3.org/Archives/Public/ietf-http-wg/2023JulSep/0025.html 
 [^2]: Interoperability has not been tested yet.
 [^3]: [Cross-Origin Resource Sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) is not supported by server.

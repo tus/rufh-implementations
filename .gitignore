@@ -1,2 +1,3 @@
+.DS_Store
 servers/go/uploads/
 clients/go/upload-state.txt

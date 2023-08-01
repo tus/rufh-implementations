@@ -5,8 +5,8 @@ Abstract:
 The upload context object managing ongoing uploads.
 */
 
-import NIOCore
 import NIOConcurrencyHelpers
+import NIOCore
 
 /// `HTTPResumableUploadContext` manages ongoing uploads.
 public final class HTTPResumableUploadContext {
@@ -14,7 +14,7 @@ public final class HTTPResumableUploadContext {
     let path: String
     let timeout: TimeAmount
     private let uploads: NIOLockedValueBox<[String: HTTPResumableUpload]> = .init([:])
-    
+
     /// Create an `HTTPResumableUploadContext` for use with `HTTPResumableUploadHandler`.
     /// - Parameters:
     ///   - origin: Scheme and authority of the upload server. For example, "https://www.example.com".
@@ -35,7 +35,7 @@ public final class HTTPResumableUploadContext {
     }
 
     private func token(fromPath path: String) -> String {
-        assert(isResumption(path: path))
+        assert(self.isResumption(path: path))
         return String(path.dropFirst(self.path.count))
     }
 
@@ -46,7 +46,7 @@ public final class HTTPResumableUploadContext {
             assert($0[token] == nil)
             $0[token] = upload
         }
-        return path(fromToken: token)
+        return self.path(fromToken: token)
     }
 
     func stopUpload(_ upload: HTTPResumableUpload) {

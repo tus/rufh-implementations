@@ -5,32 +5,36 @@ Abstract:
 The channel handler that translates resumable uploads into regular uploads.
 */
 
-import HTTPTypesNIO
 import NIOCore
+import NIOHTTPTypes
 
 /// A channel handler that translates resumable uploads into regular uploads, and passes through
 /// other HTTP traffic.
 public final class HTTPResumableUploadHandler: ChannelDuplexHandler {
-    public typealias InboundIn = HTTPTypeServerRequestPart
+    public typealias InboundIn = HTTPTypeRequestPart
     public typealias InboundOut = Never
 
     public typealias OutboundIn = Never
-    public typealias OutboundOut = HTTPTypeServerResponsePart
+    public typealias OutboundOut = HTTPTypeResponsePart
 
     var upload: HTTPResumableUpload
 
     private var context: ChannelHandlerContext!
     private var eventLoop: EventLoop!
-    
+
     /// Create an `HTTPResumableUploadHandler` within a given `HTTPResumableUploadContext`.
     /// - Parameters:
     ///   - context: The context for this upload handler.
     ///              Use the same context across upload handlers, as uploads can't resume across different contexts.
     ///   - channelConfigurator: A closure for configuring the child HTTP server channel.
-    public init(context: HTTPResumableUploadContext,
-                channelConfigurator: @escaping (Channel) -> Void) {
-        self.upload = HTTPResumableUpload(context: context,
-                                          channelConfigurator: channelConfigurator)
+    public init(
+        context: HTTPResumableUploadContext,
+        channelConfigurator: @escaping (Channel) -> Void
+    ) {
+        self.upload = HTTPResumableUpload(
+            context: context,
+            channelConfigurator: channelConfigurator
+        )
     }
 
     /// Create an `HTTPResumableUploadHandler` within a given `HTTPResumableUploadContext`.
@@ -38,8 +42,10 @@ public final class HTTPResumableUploadHandler: ChannelDuplexHandler {
     ///   - context: The context for this upload handler.
     ///              Use the same context across upload handlers, as uploads can't resume across different contexts.
     ///   - handlers: Handlers to add to the child HTTP server channel.
-    public init(context: HTTPResumableUploadContext,
-                handlers: [ChannelHandler] = []) {
+    public init(
+        context: HTTPResumableUploadContext,
+        handlers: [ChannelHandler] = []
+    ) {
         self.upload = HTTPResumableUpload(context: context) { channel in
             if !handlers.isEmpty {
                 _ = channel.pipeline.addHandlers(handlers)
@@ -75,8 +81,7 @@ public final class HTTPResumableUploadHandler: ChannelDuplexHandler {
         self.upload.writabilityChanged(handler: self)
     }
 
-    public func userInboundEventTriggered(context: ChannelHandlerContext, event: Any) {
-    }
+    public func userInboundEventTriggered(context: ChannelHandlerContext, event: Any) {}
 
     public func errorCaught(context: ChannelHandlerContext, error: Error) {
         self.upload.end(handler: self, error: error)
@@ -97,32 +102,32 @@ extension HTTPResumableUploadHandler {
         }
     }
 
-    func write(_ part: HTTPTypeServerResponsePart, promise: EventLoopPromise<Void>?) {
-        runInEventLoop {
+    func write(_ part: HTTPTypeResponsePart, promise: EventLoopPromise<Void>?) {
+        self.runInEventLoop {
             self.context.write(self.wrapOutboundOut(part), promise: promise)
         }
     }
 
     func flush() {
-        runInEventLoop {
+        self.runInEventLoop {
             self.context.flush()
         }
     }
 
-    func writeAndFlush(_ part: HTTPTypeServerResponsePart, promise: EventLoopPromise<Void>?) {
-        runInEventLoop {
+    func writeAndFlush(_ part: HTTPTypeResponsePart, promise: EventLoopPromise<Void>?) {
+        self.runInEventLoop {
             self.context.writeAndFlush(self.wrapOutboundOut(part), promise: promise)
         }
     }
 
     func read() {
-        runInEventLoop {
+        self.runInEventLoop {
             self.context.read()
         }
     }
 
     func close(mode: CloseMode, promise: EventLoopPromise<Void>?) {
-        runInEventLoop {
+        self.runInEventLoop {
             self.context.close(mode: mode, promise: promise)
         }
     }

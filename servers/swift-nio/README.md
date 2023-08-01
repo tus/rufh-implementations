@@ -9,7 +9,7 @@ This example contains a resumable upload server built using SwiftNIO. It is base
 
 ## Running
 
-Swift 5.9 is required from running the code. To start the server, use
+Swift 5.7 is required for running the code. To start the server, use
 
 ```bash
 cd ExampleServer/ && swift run
@@ -38,24 +38,29 @@ Upload-Offset: 12
 Receive a request with body length: 12
 ```
 
-2. Send an upload in multiple requests. The first Upload Creation Procedure is interrupted (you must cancel the request manually using Ctrl+C). Then the Offset Retrieving Procedure fetches the current offset and allow the Upload Appending Procedure to complete the upload:
+2. Send an upload in multiple requests. The first Upload Creation Procedure is carries the partial file. Then the Offset Retrieving Procedure fetches the current offset and allow the Upload Appending Procedure to complete the upload:
 
 ```
-$ curl -i -X POST 127.0.0.1:8080 -H 'upload-draft-interop-version: 3' -H 'upload-incomplete: ?0' -H 'content-length: 12' -d "hello "
+$ curl -i -X POST 127.0.0.1:8080 -H 'upload-draft-interop-version: 3' -H 'upload-incomplete: ?1' -d "hello "
 HTTP/1.1 104 Upload Resumption Supported
 Upload-Draft-Interop-Version: 3
-Location: http://127.0.0.1:8080/resumable_upload/3715562917226526691-13638497144091481509
+Location: http://127.0.0.1:8080/resumable_upload/4775349330246725696-8661204137960432797
 
-[NOTE to reader: Interrupt this request]
+HTTP/1.1 201 Created
+Upload-Draft-Interop-Version: 3
+Location: http://127.0.0.1:8080/resumable_upload/4775349330246725696-8661204137960432797
+Upload-Incomplete: ?1
+Upload-Offset: 6
+transfer-encoding: chunked
 
-$ curl -i --head http://127.0.0.1:8080/resumable_upload/3715562917226526691-13638497144091481509 -H 'upload-draft-interop-version: 3'
+$ curl -i --head  http://127.0.0.1:8080/resumable_upload/4775349330246725696-8661204137960432797 -H 'upload-draft-interop-version: 3'
 HTTP/1.1 204 No Content
 Upload-Draft-Interop-Version: 3
 Upload-Incomplete: ?1
 Upload-Offset: 6
 Cache-Control: no-store
 
-$ curl -i -X PATCH http://127.0.0.1:8080/resumable_upload/3715562917226526691-13638497144091481509 -H 'upload-draft-interop-version: 3' -H 'upload-offset: 6' -H 'upload-incomplete: ?0' -d "world!"
+$ curl -i -X PATCH http://127.0.0.1:8080/resumable_upload/4775349330246725696-8661204137960432797 -H 'upload-draft-interop-version: 3' -H 'upload-offset: 6' -H 'upload-incomplete: ?0' -d "world!"
 HTTP/1.1 200 OK
 Content-Type: text/plain
 Content-Length: 38
