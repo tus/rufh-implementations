@@ -26,7 +26,7 @@ The goal is to have interoperable implementations for testing purposes. Below sh
 | `servers/swift-nio` | ✅ | ✅ | ❌[^3] |
 | `servers/tusd` | ✅ | ✅ | ✅ |
 | `servers/go` | ?[^2] | ✅ | ✅ |
-| tusdotnet | ✅ | ?[^2] | ?[^2] |
+| tusdotnet | ✅ | ✅ | ✅ |
 
 [^2]: Interoperability has not been tested yet.
 [^3]: [Cross-Origin Resource Sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) is not supported by server.
