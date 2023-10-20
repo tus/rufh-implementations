@@ -2,7 +2,7 @@
 
 This repository contains server and client implementations of the [draft-ietf-httpbis-resumable-upload](https://datatracker.ietf.org/doc/draft-ietf-httpbis-resumable-upload/). Its latest iteration can be found at the [httpwg/http-extensions repository](https://github.com/httpwg/http-extensions/blob/main/draft-ietf-httpbis-resumable-upload.md).
 
-The implementations are based on the draft [-01](https://datatracker.ietf.org/doc/draft-ietf-httpbis-resumable-upload/01/).
+The implementations are based on the draft [-01](https://datatracker.ietf.org/doc/draft-ietf-httpbis-resumable-upload/01/). We will update them to match [-02](https://datatracker.ietf.org/doc/draft-ietf-httpbis-resumable-upload/02/) soon.
 
 ## Clients
 
@@ -30,3 +30,7 @@ The goal is to have interoperable implementations for testing purposes. Below sh
 
 [^2]: Interoperability has not been tested yet.
 [^3]: [Cross-Origin Resource Sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) is not supported by server.
+
+## Network simulation
+
+When running a client and server locally, the data transfer can be too fast to usefully test the pause/resume capabilities of resumable uploads. Throttling the network speed is a handy way to simulate more realistic scenarios. Browsers natively provide a setting for this in their developer tools (e.g. [Firefox](https://firefox-source-docs.mozilla.org/devtools-user/network_monitor/throttling/index.html) and [Chrome](https://developer.chrome.com/docs/devtools/settings/throttling/). When working outside of browsers, a proxy like [toxiproxy](https://github.com/Shopify/toxiproxy) can be placed in front of the upload server and control the transfer speed. It is also capable of simulating other kinds of network interruptions.
