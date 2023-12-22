@@ -107,6 +107,13 @@ func uploadCreationProcedure(file *os.File) (string, error) {
 				return nil
 			}
 
+			uploadOffset := header.Get("Upload-Offset")
+
+			if uploadOffset != "" {
+				log.Printf("Received 104 response. Server reported to have saved %s bytes\n", uploadOffset)
+				return nil
+			}
+
 			uploadUrl := header.Get("Location")
 			log.Printf("Received 104 response. Location is: %s\n", uploadUrl)
 
