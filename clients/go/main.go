@@ -107,11 +107,18 @@ func uploadCreationProcedure(file *os.File) (string, error) {
 				return nil
 			}
 
-			uploadUrl := header.Get("Location")
-			log.Printf("Received 104 response. Location is: %s\n", uploadUrl)
+			uploadOffset := header.Get("Upload-Offset")
+			if uploadOffset != "" {
+				log.Printf("Received 104 response. Server reported to have saved %s bytes\n", uploadOffset
+			}
 
-			if err := saveUploadState(uploadUrl); err != nil {
-				log.Printf("failed to write upload state file: %s", err)
+			uploadUrl := header.Get("Location")
+			if uploadUrl != "" {
+				log.Printf("Received 104 response. Location is: %s\n", uploadUrl)
+	
+				if err := saveUploadState(uploadUrl); err != nil {
+					log.Printf("failed to write upload state file: %s", err)
+				}
 			}
 
 			return nil
