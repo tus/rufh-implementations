@@ -63,13 +63,11 @@ func main() {
 
 		log.Printf("Upload offset is: %d", offset)
 
-		uploadCompleteHeader := "?0"
+		uploadCompleteHeader := "?1"
 
-		if(offset == fileInfo.Size()) {
+		if offset == fileInfo.Size() {
 			log.Println("File is already uploaded")
-			uploadCompleteHeader = "?1"
 		}
-		
 
 		if _, err := file.Seek(offset, os.SEEK_SET); err != nil {
 			log.Fatalf("failed to seek to offset: %s", err)
@@ -82,7 +80,7 @@ func main() {
 	}
 
 	log.Println("Response from server is:")
-	log.Println(response)
+	fmt.Println(response)
 
 }
 
@@ -140,7 +138,7 @@ func uploadCreationProcedure(file *os.File) (string, error) {
 
 	req, err := http.NewRequestWithContext(ctx, "POST", endpoint, file)
 	req.Header.Set("Upload-Draft-Interop-Version", InteropVersion)
-	req.Header.Set("Upload-Complete", "?0")
+	req.Header.Set("Upload-Complete", "?1")
 	if err != nil {
 		return "", err
 	}
