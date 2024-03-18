@@ -152,6 +152,9 @@ func uploadCreationProcedure(file *os.File) (string, error) {
 		return "", fmt.Errorf("unexpected status code: %d", res.StatusCode)
 	}
 
+	uploadUrl := res.Header.Get("Location")
+	log.Printf("File is completely uploaded at: %s\n", uploadUrl)
+
 	response, err := io.ReadAll(res.Body)
 	if err != nil {
 		return "", err
@@ -203,6 +206,8 @@ func uploadAppendingProcedure(uploadUrl string, file *os.File, offset int64) (st
 	if res.StatusCode < 200 || res.StatusCode > 299 {
 		return "", fmt.Errorf("unexpected status code: %d", res.StatusCode)
 	}
+
+	log.Printf("File is completely uploaded at: %s\n", uploadUrl)
 
 	response, err := io.ReadAll(res.Body)
 	if err != nil {
