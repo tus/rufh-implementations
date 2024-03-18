@@ -14,7 +14,7 @@ import (
 )
 
 const UploadDir = "./uploads/"
-const InteropVersion = "3"
+const InteropVersion = "5"
 
 func main() {
 	r := mux.NewRouter()
@@ -27,7 +27,7 @@ func main() {
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"POST", "PATCH", "HEAD", "DELETE"},
 		AllowedHeaders: []string{"*"},
-		ExposedHeaders: []string{"Upload-Draft-Interop-Version", "Upload-Offset", "Upload-Incomplete", "Location"},
+		ExposedHeaders: []string{"Upload-Draft-Interop-Version", "Upload-Offset", "Upload-Complete", "Location"},
 	})
 	http.Handle("/", c.Handler(r))
 
@@ -36,8 +36,6 @@ func main() {
 }
 
 func UploadCreationHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: Handle cases without prefer
-
 	var uploadId string
 	var file *os.File
 	var err error
@@ -199,7 +197,7 @@ func getInteropVersion(r *http.Request) string {
 }
 
 func getUploadIncomplete(r *http.Request) bool {
-	if r.Header.Get("Upload-Incomplete") == "?1" {
+	if r.Header.Get("Upload-Complete") == "?0" {
 		return true
 	} else {
 		return false
@@ -221,9 +219,9 @@ func sendError(w http.ResponseWriter, err error) {
 
 func setUploadHeaders(w http.ResponseWriter, isComplete bool, offset int64) {
 	if isComplete {
-		w.Header().Set("Upload-Incomplete", "?0")
+		w.Header().Set("Upload-Complete", "?1")
 	} else {
-		w.Header().Set("Upload-Incomplete", "?1")
+		w.Header().Set("Upload-Complete", "?0")
 	}
 	w.Header().Set("Upload-Offset", strconv.FormatInt(offset, 10))
 }
