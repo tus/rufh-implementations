@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-const InteropVersion = "4"
+const InteropVersion = "5"
 
 var endpoint string
 var filepath string
@@ -63,17 +63,16 @@ func main() {
 
 		log.Printf("Upload offset is: %d", offset)
 
-		uploadCompleteHeader := "?1"
-
 		if offset == fileInfo.Size() {
-			log.Println("File is already uploaded")
+			log.Printf("File is completely uploaded at: %s\n", uploadUrl)
+			return
 		}
 
 		if _, err := file.Seek(offset, os.SEEK_SET); err != nil {
 			log.Fatalf("failed to seek to offset: %s", err)
 		}
 
-		response, err = uploadAppendingProcedure(uploadUrl, file, offset, uploadCompleteHeader)
+		response, err = uploadAppendingProcedure(uploadUrl, file, offset)
 		if err != nil {
 			log.Fatalf("upload creation procedure failed: %s", err)
 		}
@@ -186,11 +185,11 @@ func offsetRetrievingProcedure(uploadUrl string) (offset int64, err error) {
 	return
 }
 
-func uploadAppendingProcedure(uploadUrl string, file *os.File, offset int64, uploadCompleteHeader string) (string, error) {
+func uploadAppendingProcedure(uploadUrl string, file *os.File, offset int64) (string, error) {
 	req, err := http.NewRequest("PATCH", uploadUrl, file)
 	req.Header.Set("Upload-Draft-Interop-Version", InteropVersion)
 	req.Header.Set("Upload-Offset", strconv.FormatInt(offset, 10))
-	req.Header.Set("Upload-Complete", uploadCompleteHeader)
+	req.Header.Set("Upload-Complete", "?1")
 	if err != nil {
 		return "", err
 	}
