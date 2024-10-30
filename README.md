@@ -28,7 +28,7 @@ Apple published an example implementation of a resumable upload server built usi
 
 ### Tusdotnet (.NET)
 
-[Tusdotnet](https://tus.github.io/tusd/) is a feature-rich .NET server implementation of the [tus resumable upload protocol](https://tus.io), which also includes experimental support for the draft of Resumable Upload For HTTP. Details on how to use tusdotnet with the draft can be found at https://github.com/tusdotnet/tusdotnet/tree/POC/tus2.
+[Tusdotnet](https://github.com/tusdotnet/tusdotnet/) is a feature-rich .NET server implementation of the [tus resumable upload protocol](https://tus.io), which also includes experimental support for the draft of Resumable Upload For HTTP. Details on how to use tusdotnet with the draft can be found at https://github.com/tusdotnet/tusdotnet/tree/POC/tus2.
 
 ### Go server example
 
@@ -56,22 +56,22 @@ The draft is currently still in a developing state, where it is actively discuss
 
 The following table provides an overview of which draft version is supported by which client or server implementation. A client or server can support multiple versions by adjusting to the request of the user or client. If you want to pair a client with a server for uploading data, please ensure that both implement at least one shared draft version.
 
-| Draft version     | [-01](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-01) | [-02](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-02) | [-03](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-03) |
-|:------------------|----|----|----|
-| Interop version   | 3  | 4  | 5  |
-| **Clients**       |    |    |    |
-| URLSession on iOS | ✅ |    |    |
-| tus-js-client     |    |    |    |
-| Go example        | ✅ |    |    |
-| **Servers**       |    |    |    |
-| tusd              | ✅ | ✅ | ✅ |
-| tusdotnet         |    |    | ✅ |
-| SwiftNIO          | ✅ |    |    |
-| Go example        | ✅ |    |    |
-| Caddy module      |    | ✅ |    |
-| **Tools**         |    |    |    |
-| Conformity tester |    | ✅ |    |
-| Load tester       |    |    | ✅ |
+| Draft version     | [-01](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-01) | [-02](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-02) | [-03](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-03) |[-04](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-04)|
+|:------------------|----|----|----|----|
+| Interop version   | 3  | 4  | 5  | 6  |
+| **Clients**       |    |    |    |    |
+| URLSession on iOS | ✅ |    |    |    |
+| tus-js-client     |    |    |    |    |
+| Go example        | ✅ |    |    |    |
+| **Servers**       |    |    |    |    |
+| tusd              | ✅ | ✅ | ✅ |    |
+| tusdotnet         | ✅ |    | ✅ |✅  |
+| SwiftNIO          | ✅ |    |    |    |
+| Go example        | ✅ |    |    |    |
+| Caddy module      |    | ✅ |    |    |
+| **Tools**         |    |    |    |    |
+| Conformity tester |    | ✅ |    |    |
+| Load tester       |    |    | ✅ |    |
 
 
 ## Interoperability

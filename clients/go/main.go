@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-const InteropVersion = "5"
+const InteropVersion = "6"
 
 var endpoint string
 var filepath string
@@ -123,8 +123,9 @@ func uploadCreationProcedure(file *os.File) (string, error) {
 			}
 
 			uploadUrl := header.Get("Location")
+			uploadLimit := header.Get("Upload-Limit")
 			if uploadUrl != "" {
-				log.Printf("Received 104 response. Location is: %s\n", uploadUrl)
+				log.Printf("Received 104 response.\nLocation is: %s\nUpload-Limit is: %s\n", uploadUrl, uploadLimit)
 
 				if err := saveUploadState(uploadUrl); err != nil {
 					log.Printf("failed to write upload state file: %s", err)
@@ -193,6 +194,7 @@ func uploadAppendingProcedure(uploadUrl string, file *os.File, offset int64) (st
 	req.Header.Set("Upload-Draft-Interop-Version", InteropVersion)
 	req.Header.Set("Upload-Offset", strconv.FormatInt(offset, 10))
 	req.Header.Set("Upload-Complete", "?1")
+	req.Header.Set("Content-Type", "application/partial-upload")
 	if err != nil {
 		return "", err
 	}
