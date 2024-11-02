@@ -65,9 +65,9 @@ The following table provides an overview of which draft version is supported by 
 | Go example        | ✅ |    |    |    |       |
 | **Servers**       |    |    |    |    |       |
 | tusd              | ✅ | ✅ | ✅ | ✅  | ✅    |
-| tusdotnet         | ✅ |    | ✅ |✅  | ✅    |
+| tusdotnet         | ✅ |    | ✅ | ✅ | ✅    |
 | SwiftNIO          | ✅ |    |    |    |       |
-| Go example        | ✅ |    |    |    |       |
+| Go example        |    |    |    | ✅ | ✅    |
 | Caddy module      |    | ✅ |    |    |       |
 | **Tools**         |    |    |    |    |       |
 | Conformity tester |    | ✅ |    |    |       |
