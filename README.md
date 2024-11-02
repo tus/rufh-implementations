@@ -4,9 +4,9 @@ The HTTP working group is currently discussing a draft for resumable uploads ove
 
 ## Clients
 
-### URLSession (iOS 17+)
+### URLSession (iOS 17+, macOS 14+)
 
-Apple added support for resumable uploads (draft version 01) in `URLSession` on iOS 17+. This API can be used from Swift and Object-C. A detailed introduction into resumable downloads and uploads as well as links to the API documentation can be found in [Apple's WWDC23](https://developer.apple.com/videos/play/wwdc2023/10006/). This repository contains a small iOS application demonstrating the use of resumable uploads in [`clients/ios`](/clients/ios/).
+Apple added support for resumable uploads (draft version 01) in `URLSession` on iOS 17+ and macOS 14+. This API can be used from Swift and Object-C. A detailed introduction into resumable downloads and uploads as well as links to the API documentation can be found in [Apple's WWDC23](https://developer.apple.com/videos/play/wwdc2023/10006/). This repository contains a small iOS application demonstrating the use of resumable uploads in [`clients/ios`](/clients/ios/).
 
 ### Tus-js-client (Browser, Node.js)
 
@@ -60,7 +60,7 @@ The following table provides an overview of which draft version is supported by 
 |:------------------|----|----|----|----|-------|
 | Interop version   | 3  | 4  | 5  | 6  | 6[^4] |
 | **Clients**       |    |    |    |    |       |
-| URLSession on iOS | ✅ |    |    |    |       |
+| URLSession        | ✅[^5] | | ✅[^6] | ✅[^7] | ✅[^7] |
 | tus-js-client     |    |    |    |    |       |
 | Go example        | ✅ |    |    |    |       |
 | **Servers**       |    |    |    |    |       |
@@ -74,6 +74,9 @@ The following table provides an overview of which draft version is supported by 
 | Load tester       |    |    | ✅ |    |       |
 
 [^4]: Draft -05 did not introduce breaking changes compared to -04 and therefore kept the interop version.
+[^5]: Only in iOS 17.x and macOS 14.x
+[^6]: Only in iOS 18.0 and macOS 15.0
+[^7]: Only since iOS 18.1 and macOS 15.1
 
 ## Interoperability
 
