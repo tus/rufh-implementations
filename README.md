@@ -64,7 +64,7 @@ The following table provides an overview of which draft version is supported by 
 | tus-js-client     |    |    | ✅ |    |       |
 | Go example        | ✅ |    |    |    |       |
 | **Servers**       |    |    |    |    |       |
-| tusd              | ✅ | ✅ | ✅ |    |       |
+| tusd              | ✅ | ✅ | ✅ | ✅  | ✅    |
 | tusdotnet         | ✅ |    | ✅ |✅  | ✅    |
 | SwiftNIO          | ✅ |    |    |    |       |
 | Go example        | ✅ |    |    |    |       |
