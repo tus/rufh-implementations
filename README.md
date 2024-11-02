@@ -4,9 +4,9 @@ The HTTP working group is currently discussing a draft for resumable uploads ove
 
 ## Clients
 
-### URLSession (iOS 17+)
+### URLSession (iOS 17+, macOS 14+)
 
-Apple added support for resumable uploads (draft version 01) in `URLSession` on iOS 17+. This API can be used from Swift and Object-C. A detailed introduction into resumable downloads and uploads as well as links to the API documentation can be found in [Apple's WWDC23](https://developer.apple.com/videos/play/wwdc2023/10006/). This repository contains a small iOS application demonstrating the use of resumable uploads in [`clients/ios`](/clients/ios/).
+Apple added support for resumable uploads (draft version 01) in `URLSession` on iOS 17+ and macOS 14+. This API can be used from Swift and Object-C. A detailed introduction into resumable downloads and uploads as well as links to the API documentation can be found in [Apple's WWDC23](https://developer.apple.com/videos/play/wwdc2023/10006/). This repository contains a small iOS application demonstrating the use of resumable uploads in [`clients/ios`](/clients/ios/).
 
 ### Tus-js-client (Browser, Node.js)
 
@@ -56,23 +56,27 @@ The draft is currently still in a developing state, where it is actively discuss
 
 The following table provides an overview of which draft version is supported by which client or server implementation. A client or server can support multiple versions by adjusting to the request of the user or client. If you want to pair a client with a server for uploading data, please ensure that both implement at least one shared draft version.
 
-| Draft version     | [-01](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-01) | [-02](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-02) | [-03](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-03) |[-04](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-04)|
-|:------------------|----|----|----|----|
-| Interop version   | 3  | 4  | 5  | 6  |
-| **Clients**       |    |    |    |    |
-| URLSession on iOS | ✅ |    |    |    |
-| tus-js-client     |    |    |    |    |
-| Go example        | ✅ |    |    |    |
-| **Servers**       |    |    |    |    |
-| tusd              | ✅ | ✅ | ✅ |    |
-| tusdotnet         | ✅ |    | ✅ | ✅ |
-| SwiftNIO          | ✅ |    |    |    |
-| Go example        |   |    |    |  ✅ |
-| Caddy module      |    | ✅ |    |    |
-| **Tools**         |    |    |    |    |
-| Conformity tester |    | ✅ |    |    |
-| Load tester       |    |    | ✅ |    |
+| Draft version     | [-01](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-01) | [-02](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-02) | [-03](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-03) |[-04](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-04)|[-05](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-resumable-upload-05)|
+|:------------------|----|----|----|----|-------|
+| Interop version   | 3  | 4  | 5  | 6  | 6[^4] |
+| **Clients**       |    |    |    |    |       |
+| URLSession        | ✅[^5] | | ✅[^6] | ✅[^7] | ✅[^7] |
+| tus-js-client     |    |    | ✅ | ✅  | ✅    |
+| Go example        | ✅ |    |    |    |       |
+| **Servers**       |    |    |    |    |       |
+| tusd              | ✅ | ✅ | ✅ | ✅  | ✅    |
+| tusdotnet         | ✅ |    | ✅ | ✅ | ✅    |
+| SwiftNIO          | ✅ |    |    |    |       |
+| Go example        |    |    |    | ✅ | ✅    |
+| Caddy module      |    | ✅ |    |    |       |
+| **Tools**         |    |    |    |    |       |
+| Conformity tester |    | ✅ |    |    |       |
+| Load tester       |    |    | ✅ |    |       |
 
+[^4]: Draft -05 did not introduce breaking changes compared to -04 and therefore kept the interop version.
+[^5]: Only in iOS 17.x and macOS 14.x
+[^6]: Only in iOS 18.0 and macOS 15.0
+[^7]: Only since iOS 18.1 and macOS 15.1
 
 ## Interoperability
 
@@ -82,7 +86,7 @@ The goal is to have interoperable implementations for testing purposes. Below sh
 |-------------------|------------------|---------------|-------------------|
 | SwiftNIO          | ✅               | ❌[^3]        | ❌[^1]            |
 | Tusd              | ✅               | ✅            | ✅                |
-| Tusdotnet         | ❌[^1]           | ✅            | ?[^2]             |
+| Tusdotnet         | ✅               | ✅            | ?[^2]             |
 | Go server example | ❌[^1]           | ✅            | ✅                |
 
 [^1]: No interop version implemented by server and client.
