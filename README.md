@@ -61,7 +61,7 @@ The following table provides an overview of which draft version is supported by 
 | Interop version   | 3  | 4  | 5  | 6  | 6[^4] |
 | **Clients**       |    |    |    |    |       |
 | URLSession        | ✅[^5] | | ✅[^6] | ✅[^7] | ✅[^7] |
-| tus-js-client     |    |    |    |    |       |
+| tus-js-client     |    |    | ✅ |    |       |
 | Go example        | ✅ |    |    |    |       |
 | **Servers**       |    |    |    |    |       |
 | tusd              | ✅ | ✅ | ✅ |    |       |
