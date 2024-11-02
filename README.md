@@ -83,7 +83,7 @@ The goal is to have interoperable implementations for testing purposes. Below sh
 |-------------------|------------------|---------------|-------------------|
 | SwiftNIO          | ✅               | ❌[^3]        | ❌[^1]            |
 | Tusd              | ✅               | ✅            | ✅                |
-| Tusdotnet         | ❌[^1]           | ✅            | ?[^2]             |
+| Tusdotnet         | ✅               | ✅            | ?[^2]             |
 | Go server example | ❌[^1]           | ✅            | ✅                |
 
 [^1]: No interop version implemented by server and client.
