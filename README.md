@@ -82,12 +82,14 @@ The following table provides an overview of which draft version is supported by 
 
 The goal is to have interoperable implementations for testing purposes. Below shows a table of the interoperability between various client and server implementations.
 
-|                   | URLSession (iOS) | Tus-js-Client | Go client example |
-|-------------------|------------------|---------------|-------------------|
-| SwiftNIO          | ✅               | ❌[^3]        | ❌[^1]            |
-| Tusd              | ✅               | ✅            | ✅                |
-| Tusdotnet         | ✅               | ✅            | ?[^2]             |
-| Go server example | ❌[^1]           | ✅            | ✅                |
+|                   | Clients                 |                              |                |
+|-------------------|-------------------------|------------------------------|----------------|
+|                   | URLSession (iOS, macOS) | Tus-js-client (Web, Node.js) | Go demo client |
+| **Servers**       |                         |                              |                |
+| Tusd              | ✅                      | ✅                           | ✅             |
+| Tusdotnet         | ✅                      | ✅                           | ✅             |
+| Go demo example   | ✅                      | ✅                           | ✅             |
+| SwiftNIO          | ?[^2]                   | ?[^2]                        | ?[^2]          |
 
 [^1]: No interop version implemented by server and client.
 [^2]: Interoperability has not been tested yet.
