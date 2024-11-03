@@ -95,4 +95,19 @@ The goal is to have interoperable implementations for testing purposes. Below sh
 
 ## Network simulation
 
-When running a client and server locally, the data transfer can be too fast to usefully test the pause/resume capabilities of resumable uploads. Throttling the network speed is a handy way to simulate more realistic scenarios. Browsers natively provide a setting for this in their developer tools (e.g. [Firefox](https://firefox-source-docs.mozilla.org/devtools-user/network_monitor/throttling/index.html) and [Chrome](https://developer.chrome.com/docs/devtools/settings/throttling/). When working outside of browsers, a proxy like [toxiproxy](https://github.com/Shopify/toxiproxy) can be placed in front of the upload server and control the transfer speed. It is also capable of simulating other kinds of network interruptions.
+When running a client and server locally, the data transfer can be too fast to usefully test the pause/resume capabilities of resumable uploads. Throttling the network speed is a handy way to simulate more realistic scenarios. Browsers natively provide a setting for this in their developer tools (e.g. [Firefox](https://firefox-source-docs.mozilla.org/devtools-user/network_monitor/throttling/index.html) and [Chrome](https://developer.chrome.com/docs/devtools/settings/throttling/).
+
+When working outside of browsers, a proxy like [toxiproxy](https://github.com/Shopify/toxiproxy) can be placed in front of the upload server and control the transfer speed. It is also capable of simulating other kinds of network interruptions.
+
+```bash
+# Start toxiproxy control server in a separate tab
+toxiproxy-server
+
+# In a new tab, setup a throttled connection to your server.
+# The upload server should listen at localhost:8080 and the throttled server
+# listens at localhost:8081. The bandwidth is limited to 2048kb/s (2mb/s).
+# Adjust these values to your needs
+toxiproxy-cli create --listen localhost:8081 --upstream localhost:8080 upload-server
+toxiproxy-cli toxic add --type bandwidth --toxicName bandwidth-limit-1 --downstream --attribute rate=2048 upload-server
+toxiproxy-cli toxic add --type bandwidth --toxicName bandwidth-limit-2 --upstream --attribute rate=2048 upload-server
+```
