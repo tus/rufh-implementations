@@ -62,7 +62,7 @@ The following table provides an overview of which draft version is supported by 
 | **Clients**       |    |    |    |    |       |
 | URLSession        | ✅[^5] | | ✅[^6] | ✅[^7] | ✅[^7] |
 | tus-js-client     |    |    | ✅ | ✅  | ✅    |
-| Go example        | ✅ |    |    |    |       |
+| Go example        |    |    |    | ✅ | ✅    |
 | **Servers**       |    |    |    |    |       |
 | tusd              | ✅ | ✅ | ✅ | ✅  | ✅    |
 | tusdotnet         | ✅ |    | ✅ | ✅ | ✅    |

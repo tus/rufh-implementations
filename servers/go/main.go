@@ -14,7 +14,7 @@ import (
 )
 
 const UploadDir = "./uploads/"
-const InteropVersion = "5"
+const InteropVersion = "6"
 
 func main() {
 	r := mux.NewRouter()
@@ -112,6 +112,12 @@ func UploadAppendingHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
+
+	if r.Header.Get("Content-Type") != "application/partial-upload" {
+		w.WriteHeader(415)
+		w.Write([]byte("unsupported media type\n"))
+		return
+	}
 
 	isComplete_client := !getUploadIncomplete(r)
 	offset_client, ok := getUploadOffset(r)
